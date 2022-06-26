@@ -20,6 +20,26 @@ export class MongodbLogService {
     });
   }
 
+  async log(level: string, message: string): Promise<InsertOneResult<any>> {
+    return await this.logColletion.insertOne({ level, message, date: new Date() });
+  }
+
+  async logInfo(message: string): Promise<InsertOneResult<any>> {
+    return await this.log('info', message);
+  }
+
+  async logError(message: string): Promise<InsertOneResult<any>> {
+    return await this.log('error', message);
+  }
+
+  async logWarning(message: string): Promise<InsertOneResult<any>> {
+    return await this.log('warning', message);
+  }
+
+  async logDebug(message: string): Promise<InsertOneResult<any>> {
+    return await this.log('debug', message);
+  }
+
   async registerLog(log: any): Promise<InsertOneResult<any>> {
     return await this.register(this.logColletion, log);
   }
