@@ -23,7 +23,8 @@
   "keywords": [
     "mongodb",
     "log",
-    "nestjs"
+    "nestjs",
+    "nestjs-mongolog"
   ],
   "author": "Anderson Gonçalves",
   "license": "ISC",

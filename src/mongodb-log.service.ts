@@ -21,7 +21,11 @@ export class MongodbLogService {
   }
 
   async log(level: string, message: string): Promise<InsertOneResult<any>> {
-    return await this.logColletion.insertOne({ level, message, date: new Date() });
+    try {
+      return await this.logColletion.insertOne({ level, message, date: new Date() });
+    } catch (error: any) {
+      MongodbLogError.print(error?.message);
+    }
   }
 
   async logInfo(message: string): Promise<InsertOneResult<any>> {
@@ -45,15 +49,23 @@ export class MongodbLogService {
   }
 
   async registerOn(collectionName: string, data: any): Promise<InsertOneResult<any> | undefined> {
-    const collection = this.additionalCollections[collectionName];
-    if (!collection) {
-      MongodbLogError.print(`Additional collection "${collectionName}" need to be set on module config.`);
-      return;
+    try {
+      const collection = this.additionalCollections[collectionName];
+      if (!collection) {
+        MongodbLogError.print(`Additional collection "${collectionName}" need to be set on module config.`);
+        return;
+      }
+      return await this.register(collection, data);
+    } catch (error: any) {
+      MongodbLogError.print(error?.message);
     }
-    return await this.register(collection, data);
   }
 
   private async register(colletion: Collection, data: any): Promise<InsertOneResult<any>> {
-    return await colletion.insertOne({ data, date: new Date() });
+    try {
+      return await colletion.insertOne({ data, date: new Date() });
+    } catch (error: any) {
+      MongodbLogError.print(error?.message);
+    }
   }
 }
