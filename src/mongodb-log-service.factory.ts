@@ -2,15 +2,18 @@ import { MongodbLogConfig } from './mongodb-log.config';
 import { MongodbLogService } from './mongodb-log.service';
 import { MongodbLogConnections } from './mongodb-log.connections';
 import { DEFAULT_LOG_COLLECTION_NAME, MONGODB_LOG_CONFIG } from './constants';
-import { MongodbLogError } from './mongodb-log.error';
 import { Inject } from '@nestjs/common';
+import { Logger } from 'tslog';
 
 export class MongodbLogServiceFactory {
   static async create(
     @Inject(MONGODB_LOG_CONFIG) config: MongodbLogConfig,
     connections: MongodbLogConnections,
   ): Promise<MongodbLogService> {
+    const logger = new Logger();
+
     if (!config) {
+      logger.error("MongodbLogServiceFactory: 'config' is required");
       return null;
     }
     try {
@@ -22,7 +25,7 @@ export class MongodbLogServiceFactory {
         config.additionalCollectionNames,
       );
     } catch (error: any) {
-      MongodbLogError.print(error?.message);
+      logger.error(`MongodbLogServiceFactory: ${error.message}`);
       throw error;
     }
   }

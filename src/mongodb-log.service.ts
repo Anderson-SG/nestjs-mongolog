@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { MongoClient, Collection, InsertOneResult } from 'mongodb';
-import { MongodbLogError } from './mongodb-log.error';
+import { Logger } from 'tslog';
 
 @Injectable()
 export class MongodbLogService {
   private logColletion: Collection;
   private additionalCollections: { [name: string]: Collection } = {};
+  private logger: Logger;
 
   constructor(
     private readonly client: MongoClient,
@@ -14,17 +15,37 @@ export class MongodbLogService {
     private readonly additionalCollectionNames?: string[],
   ) {
     const database = this.client.db(this.databaseName);
+
     this.logColletion = database.collection(this.logsCollectionName);
+
     this.additionalCollectionNames?.forEach((name) => {
       this.additionalCollections[name] = database.collection(name);
     });
+
+    this.logger = new Logger();
   }
 
   async log(level: string, message: string): Promise<InsertOneResult<any>> {
     try {
-      return await this.logColletion.insertOne({ level, message, date: new Date() });
+      switch (level) {
+        case 'info':
+          this.logger.info(message);
+          return await this.logColletion.insertOne({ level, message, date: new Date() });
+        case 'warning':
+          this.logger.warn(message);
+          return await this.logColletion.insertOne({ level, message, date: new Date() });
+        case 'error':
+          this.logger.error(message);
+          return await this.logColletion.insertOne({ level, message, date: new Date() });
+        case 'debug':
+          this.logger.debug(message);
+          return await this.logColletion.insertOne({ level, message, date: new Date() });
+        default:
+          this.logger.info(message);
+          return await this.logColletion.insertOne({ level, message, date: new Date() });
+      }
     } catch (error: any) {
-      MongodbLogError.print(error?.message);
+      this.logger.error(`Failed to write log to mongodb: ${error?.message}`);
     }
   }
 
@@ -51,13 +72,15 @@ export class MongodbLogService {
   async registerOn(collectionName: string, data: any): Promise<InsertOneResult<any> | undefined> {
     try {
       const collection = this.additionalCollections[collectionName];
+
       if (!collection) {
-        MongodbLogError.print(`Additional collection "${collectionName}" need to be set on module config.`);
+        this.logger.error(`registerOn :: Additional collection "${collectionName}" need to be set on module config.`);
         return;
       }
+
       return await this.register(collection, data);
     } catch (error: any) {
-      MongodbLogError.print(error?.message);
+      this.logger.error(`registerOn :: Failed to write log to mongodb: ${error?.message}`);
     }
   }
 
@@ -65,7 +88,7 @@ export class MongodbLogService {
     try {
       return await colletion.insertOne({ data, date: new Date() });
     } catch (error: any) {
-      MongodbLogError.print(error?.message);
+      this.logger.error(`register :: Failed to write log to mongodb: ${error?.message}`);
     }
   }
 }
