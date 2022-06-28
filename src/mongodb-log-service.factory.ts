@@ -21,8 +21,8 @@ export class MongodbLogServiceFactory {
       return new MongodbLogService(
         connection,
         config.databaseName,
-        config.logsCollectionName || DEFAULT_LOG_COLLECTION_NAME,
-        config.additionalCollectionNames,
+        config.collectionName || DEFAULT_LOG_COLLECTION_NAME,
+        config.showInConsole || false,
       );
     } catch (error: any) {
       logger.error(`MongodbLogServiceFactory: ${error.message}`);

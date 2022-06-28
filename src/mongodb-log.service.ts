@@ -5,92 +5,117 @@ import { Logger } from 'tslog';
 @Injectable()
 export class MongodbLogService {
   private logColletion: Collection;
-  private additionalCollections: { [name: string]: Collection } = {};
   private logger: Logger;
 
   constructor(
     private readonly client: MongoClient,
     private readonly databaseName: string,
-    private readonly logsCollectionName: string,
-    private readonly additionalCollectionNames?: string[],
+    private readonly collectionName: string,
     private readonly showInConsole?: boolean,
   ) {
     const database = this.client.db(this.databaseName);
-
-    this.logColletion = database.collection(this.logsCollectionName);
-
-    this.additionalCollectionNames?.forEach((name) => {
-      this.additionalCollections[name] = database.collection(name);
-    });
-
+    this.logColletion = database.collection(this.collectionName);
     this.logger = new Logger();
   }
 
-  async log(level: string, message: string): Promise<InsertOneResult<any>> {
+  private handleLogInput(log: any): any {
+    try {
+      switch (typeof log) {
+        case 'string':
+          return { message: log };
+        case 'object':
+          return JSON.parse(JSON.stringify(log));
+        case 'number':
+          return { value: log.toString() };
+        case 'boolean':
+          return { value: log.toString() };
+        case 'function':
+          return { message: log.toString() };
+        case 'symbol':
+          return { message: log.toString() };
+        case 'undefined':
+          return { message: 'undefined' };
+        case 'bigint':
+          return { value: log.toString() };
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `handleLogInput :: Failed to handle log input: ${error?.message} report this to the developer.`,
+      );
+      return { message: 'Failed to handle log input' };
+    }
+  }
+
+  async log(level: string, data: any, logContext: string): Promise<InsertOneResult<any>> {
     try {
       switch (level) {
         case 'info':
-          if (this.showInConsole) this.logger.info(message);
-
-          return await this.logColletion.insertOne({ level, message, date: new Date() });
+          if (this.showInConsole) this.logger.info(data);
+          return await this.logColletion.insertOne({
+            level,
+            logContext,
+            logData: this.handleLogInput(data),
+            createdAt: new Date(),
+          });
         case 'warning':
-          if (this.showInConsole) this.logger.warn(message);
-          return await this.logColletion.insertOne({ level, message, date: new Date() });
+          if (this.showInConsole) this.logger.warn(data);
+          return await this.logColletion.insertOne({
+            level,
+            logContext,
+            logData: this.handleLogInput(data),
+            createdAt: new Date(),
+          });
         case 'error':
-          if (this.showInConsole) this.logger.error(message);
-          return await this.logColletion.insertOne({ level, message, date: new Date() });
+          if (this.showInConsole) this.logger.error(data);
+          return await this.logColletion.insertOne({
+            level,
+            logContext,
+            logData: this.handleLogInput(data),
+            createdAt: new Date(),
+          });
         case 'debug':
-          if (this.showInConsole) this.logger.debug(message);
-          return await this.logColletion.insertOne({ level, message, date: new Date() });
+          if (this.showInConsole) this.logger.debug(data);
+          return await this.logColletion.insertOne({
+            level,
+            logContext,
+            logData: this.handleLogInput(data),
+            createdAt: new Date(),
+          });
         default:
-          if (this.showInConsole) this.logger.info(message);
-          return await this.logColletion.insertOne({ level, message, date: new Date() });
+          if (this.showInConsole) this.logger.info(data);
+          return await this.logColletion.insertOne({
+            level,
+            logContext,
+            logData: this.handleLogInput(data),
+            createdAt: new Date(),
+          });
       }
     } catch (error: any) {
       this.logger.error(`Failed to write log to mongodb: ${error?.message}`);
     }
   }
 
-  async logInfo(message: string): Promise<InsertOneResult<any>> {
-    return await this.log('info', message);
+  async info(data: any, context?: string): Promise<InsertOneResult<any>> {
+    return await this.log('info', data, context || 'default');
   }
 
-  async logError(message: string): Promise<InsertOneResult<any>> {
-    return await this.log('error', message);
+  async silly(data: any, context?: string): Promise<InsertOneResult<any>> {
+    return await this.log('silly', data, context || 'default');
   }
 
-  async logWarning(message: string): Promise<InsertOneResult<any>> {
-    return await this.log('warning', message);
+  async error(data: any, context?: string): Promise<InsertOneResult<any>> {
+    return await this.log('error', data, context || 'default');
   }
 
-  async logDebug(message: string): Promise<InsertOneResult<any>> {
-    return await this.log('debug', message);
+  async warn(data: any, context?: string): Promise<InsertOneResult<any>> {
+    return await this.log('warning', data, context || 'default');
   }
 
-  async registerLog(log: any): Promise<InsertOneResult<any>> {
-    return await this.register(this.logColletion, log);
+  async debug(data: any, context?: string): Promise<InsertOneResult<any>> {
+    return await this.log('debug', data, context || 'default');
   }
 
-  async registerOn(collectionName: string, data: any): Promise<InsertOneResult<any> | undefined> {
-    try {
-      const collection = this.additionalCollections[collectionName];
-
-      if (!collection) {
-        this.logger.error(`registerOn :: Additional collection "${collectionName}" need to be set on module config.`);
-        return;
-      }
-
-      return await this.register(collection, data);
-    } catch (error: any) {
-      this.logger.error(`registerOn :: Failed to write log to mongodb: ${error?.message}`);
-    }
-  }
-
-  private async register(colletion: Collection, data: any): Promise<InsertOneResult<any>> {
-    try {
-      return await colletion.insertOne({ data, date: new Date() });
-    } catch (error: any) {
-      this.logger.error(`register :: Failed to write log to mongodb: ${error?.message}`);
-    }
+  async fatal(data: any, context?: string): Promise<InsertOneResult<any>> {
+    return await this.log('fatal', data, context || 'default');
   }
 }
