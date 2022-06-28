@@ -13,6 +13,7 @@ export class MongodbLogService {
     private readonly databaseName: string,
     private readonly logsCollectionName: string,
     private readonly additionalCollectionNames?: string[],
+    private readonly showInConsole?: boolean,
   ) {
     const database = this.client.db(this.databaseName);
 
@@ -29,19 +30,20 @@ export class MongodbLogService {
     try {
       switch (level) {
         case 'info':
-          this.logger.info(message);
+          if (this.showInConsole) this.logger.info(message);
+
           return await this.logColletion.insertOne({ level, message, date: new Date() });
         case 'warning':
-          this.logger.warn(message);
+          if (this.showInConsole) this.logger.warn(message);
           return await this.logColletion.insertOne({ level, message, date: new Date() });
         case 'error':
-          this.logger.error(message);
+          if (this.showInConsole) this.logger.error(message);
           return await this.logColletion.insertOne({ level, message, date: new Date() });
         case 'debug':
-          this.logger.debug(message);
+          if (this.showInConsole) this.logger.debug(message);
           return await this.logColletion.insertOne({ level, message, date: new Date() });
         default:
-          this.logger.info(message);
+          if (this.showInConsole) this.logger.info(message);
           return await this.logColletion.insertOne({ level, message, date: new Date() });
       }
     } catch (error: any) {
