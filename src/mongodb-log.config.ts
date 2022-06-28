@@ -4,7 +4,6 @@ export interface MongodbLogConfig {
   connectionString: string;
   databaseName: string;
   mongoClientOptions?: MongoClientOptions;
-  logsCollectionName?: string;
-  additionalCollectionNames?: string[];
+  collectionName?: string;
   showInConsole?: boolean;
 }
