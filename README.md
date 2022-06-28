@@ -40,7 +40,7 @@ Package for logging things into Mongodb.
 	    }),
 	    inject: [ConfigService],
     })
-```
+```js
 
 The fields to be passed in the configuration are as follows:
 <ol>
@@ -70,7 +70,7 @@ Usage:
     await  this.logger.warn("MESSAGE");
     await  this.logger.debug("MESSAGE");
 	await  this.logger.silly("MESSAGE");
-
+	await  this.logger.fatal("MESSAGE");
 ```
 
   
