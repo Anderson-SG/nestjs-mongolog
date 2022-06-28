@@ -30,7 +30,7 @@ Package for logging things into Mongodb.
 <li>Import <b>MongodbLogModule</b> and use <b>forRoot</b> or <b>forRootAsync</b> static methods on your <b>Module</b> for initial configuration:</li>
 
   
-```
+```js script
     MongodbLogModule.forRootAsync({
 	    imports: [ConfigModule],
 	    useFactory: async (configService: ConfigService) => ({
@@ -40,7 +40,7 @@ Package for logging things into Mongodb.
 	    }),
 	    inject: [ConfigService],
     })
-```js
+```
 
 The fields to be passed in the configuration are as follows:
 <ol>
@@ -54,7 +54,7 @@ The fields to be passed in the configuration are as follows:
 
 <li>Import <b>MongodbLogService</b> on your service or controller and use <b>registerLog</b> method to register log on default log collection,</li> 
 
-```
+```js script
     constructor(
 	    private  readonly  logger:  MongodbLogService,
     ) {}
@@ -62,7 +62,7 @@ The fields to be passed in the configuration are as follows:
 
 Usage:
 
-```
+```js script
     await  this.logger.info("MESSAGE");
 	await  this.logger.info({ fo: bar, ov: av });
 	await  this.logger.info({ fo: bar, ov: av }, "currentFunctionName ou any ContextData");
