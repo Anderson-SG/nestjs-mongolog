@@ -19,11 +19,9 @@ MongodbLogModule.forRootAsync({
   imports: [ConfigModule],
 
   useFactory: async (configService: ConfigService) => ({
-    connectionString: configService.get < string > 'DATABASE_URI',
-
-    databaseName: configService.get < string > 'DATABASE_NAME',
-
-    collectionName: configService.get < string > 'LOGS_COLLECTION_NAME',
+    connectionString: configService.get<string>('DATABASE_URI'),
+    databaseName: configService.get<string>('DATABASE_NAME'),
+    collectionName: configService.get<string>('LOGS_COLLECTION_NAME'),
   }),
 
   inject: [ConfigService],
