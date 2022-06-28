@@ -30,7 +30,7 @@ Package for logging things into Mongodb.
 <li>Import <b>MongodbLogModule</b> and use <b>forRoot</b> or <b>forRootAsync</b> static methods on your <b>Module</b> for initial configuration:</li>
 
   
-
+```
     MongodbLogModule.forRootAsync({
 	    imports: [ConfigModule],
 	    useFactory: async (configService: ConfigService) => ({
@@ -39,7 +39,7 @@ Package for logging things into Mongodb.
 	    }),
 	    inject: [ConfigService],
     })
-
+```
 
 The fields to be passed in the configuration are as follows:
 <ol>
