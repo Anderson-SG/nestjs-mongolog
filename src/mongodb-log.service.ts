@@ -64,26 +64,26 @@ export class MongodbLogService {
   }
 
   async info(data: any, context?: string): Promise<InsertOneResult<any>> {
-    return await this.log('info', data, context || 'default');
+    return this.log('info', data, context || 'default');
   }
 
   async silly(data: any, context?: string): Promise<InsertOneResult<any>> {
-    return await this.log('silly', data, context || 'default');
+    return this.log('silly', data, context || 'default');
   }
 
   async error(data: any, context?: string): Promise<InsertOneResult<any>> {
-    return await this.log('error', data, context || 'default');
+    return this.log('error', data, context || 'default');
   }
 
   async warn(data: any, context?: string): Promise<InsertOneResult<any>> {
-    return await this.log('warning', data, context || 'default');
+    return this.log('warning', data, context || 'default');
   }
 
   async debug(data: any, context?: string): Promise<InsertOneResult<any>> {
-    return await this.log('debug', data, context || 'default');
+    return this.log('debug', data, context || 'default');
   }
 
   async fatal(data: any, context?: string): Promise<InsertOneResult<any>> {
-    return await this.log('fatal', data, context || 'default');
+    return this.log('fatal', data, context || 'default');
   }
 }
