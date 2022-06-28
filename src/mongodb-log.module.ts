@@ -65,21 +65,20 @@ export class MongodbLogModule {
     };
 
     const isAsyncConfig = 'useFactory' in config;
+
     if (isAsyncConfig) {
-      const asyncConfig = config as MongodbLogConfigAsync;
-      moduleMetadata.imports = asyncConfig.imports;
+      moduleMetadata.imports = config.imports;
       moduleMetadata.providers.push({
         provide: MONGODB_LOG_CONFIG,
-        useFactory: asyncConfig.useFactory,
-        inject: asyncConfig.inject,
+        useFactory: config.useFactory,
+        inject: config.inject,
       });
       return moduleMetadata;
     }
 
-    const syncConfig = config as MongodbLogConfig;
     moduleMetadata.providers.push({
       provide: MONGODB_LOG_CONFIG,
-      useValue: syncConfig,
+      useValue: config,
     });
     return moduleMetadata;
   }
