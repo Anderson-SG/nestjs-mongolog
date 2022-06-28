@@ -48,9 +48,7 @@ export class MongodbLogModule {
     const isAsyncConfig = 'useFactory' in config;
     return {
       ...moduleMetadata,
-      imports: isAsyncConfig
-        ? [MongodbLogHostModule.forRootAsync(config as MongodbLogConfigAsync)]
-        : [MongodbLogHostModule.forRoot(config as MongodbLogConfig)],
+      imports: isAsyncConfig ? [MongodbLogHostModule.forRootAsync(config)] : [MongodbLogHostModule.forRoot(config)],
     };
   }
 
