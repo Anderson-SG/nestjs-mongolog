@@ -46,7 +46,7 @@ export class MongodbLogService {
     }
   }
 
-  async log(level: string, data: any, logContext: string): Promise<InsertOneResult<any>> {
+  private async log(level: string, data: any, logContext: string): Promise<InsertOneResult<any>> {
     try {
       switch (level) {
         case 'info':
