@@ -48,48 +48,16 @@ export class MongodbLogService {
 
   private async log(level: string, data: any, logContext: string): Promise<InsertOneResult<any>> {
     try {
-      switch (level) {
-        case 'info':
-          if (this.showInConsole) this.logger.info(data);
-          return await this.logColletion.insertOne({
-            level,
-            logContext,
-            logData: this.handleLogInput(data),
-            createdAt: new Date(),
-          });
-        case 'warning':
-          if (this.showInConsole) this.logger.warn(data);
-          return await this.logColletion.insertOne({
-            level,
-            logContext,
-            logData: this.handleLogInput(data),
-            createdAt: new Date(),
-          });
-        case 'error':
-          if (this.showInConsole) this.logger.error(data);
-          return await this.logColletion.insertOne({
-            level,
-            logContext,
-            logData: this.handleLogInput(data),
-            createdAt: new Date(),
-          });
-        case 'debug':
-          if (this.showInConsole) this.logger.debug(data);
-          return await this.logColletion.insertOne({
-            level,
-            logContext,
-            logData: this.handleLogInput(data),
-            createdAt: new Date(),
-          });
-        default:
-          if (this.showInConsole) this.logger.info(data);
-          return await this.logColletion.insertOne({
-            level,
-            logContext,
-            logData: this.handleLogInput(data),
-            createdAt: new Date(),
-          });
-      }
+      const logObj = {
+        level,
+        logContext,
+        logData: this.handleLogInput(data),
+        createdAt: new Date(),
+      };
+
+      if (this.showInConsole) this.logger.info(logObj);
+
+      return await this.logColletion.insertOne(logObj);
     } catch (error: any) {
       this.logger.error(`Failed to write log to mongodb: ${error?.message}`);
     }
